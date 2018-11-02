@@ -1,3 +1,5 @@
+import pygame as pg
+
 # PRE-OPTIONS
 D_1 = (800, 600)
 D_2 = (640, 480)
@@ -21,3 +23,6 @@ RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 SAKURA = (255, 183, 197)
+
+# FONT
+FONT = pg.font.match_font('arial')

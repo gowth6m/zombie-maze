@@ -9,10 +9,11 @@ class Player(pg.sprite.Sprite):
         self.image = pg.Surface((40, 40))
         self.image.fill(SAKURA)
         self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH/2, HEIGHT/2)
-        self.pos = vec(WIDTH/2, HEIGHT/2)
+        self.rect.center = (SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2)
+        self.pos = vec(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
+        # self.wealth = 0
 
     def update(self):
         self.acc = vec(0, 0)
