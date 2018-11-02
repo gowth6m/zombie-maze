@@ -1,12 +1,13 @@
-##########################
-######## THE MAZE ########
-##########################
+##########################################
+################ THE MAZE ################
+##########################################
 import pygame as pg
 import random
 import math
 
 from settings import *
 from sprites import *
+from room import *
 
 class Game:
     def __init__(self):
@@ -21,8 +22,10 @@ class Game:
     def new(self):
         # START A NEW GAME - RESET
         self.all_sprites = pg.sprite.Group()
+        # self.wall = pg.sprite.Group()
         self.player = Player()
         self.all_sprites.add(self.player)
+        # self.wall = Wall(20, 50)
         self.run()
 
     def run(self):
@@ -34,23 +37,10 @@ class Game:
             self.update()
             self.draw()
 
-    # font = pg.font.SysFont(None, 25)
-    # def message_to_screen(self, msg, colour):
-    #     screen_text = FONT.render(msg, True, colour)
-    #     self.gameDisplay.blit(screen_text, [SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2])
-    #
-    # def draw_text(self, surf, text, size, x, y):
-    #     font = pg.font.Font(FONT, size)
-    #     text_surface = font.render(text, True, WHITE)
-    #     text_rect = text_surface.get_rect()
-    #     text_rect.midtop = (x, y)
-    #     surf.blit(text_surface, text_rect)
-
     def update(self):
         # GAME LOOP - UPDATE
         self.all_sprites.update()
-        # self.message_to_screen("TESTING", WHITE)
-        # self.draw_text(self.gameDisplay, "str(score)", 18, SCREEN_SIZE[0]/2, 100)
+        # self.message_display("SCORE")
 
     def events(self):
         # GAME LOOP - EVENTS
@@ -61,9 +51,27 @@ class Game:
                     self.playing = False
                 self.running = False
 
+    def draw_grid(self):
+        for x in range(0, SCREEN_SIZE[0], TILESIZE):
+            pg.draw.line(self.gameDisplay, LIGHTGREY, (x, 0), (x, SCREEN_SIZE[1]))
+        for y in range(0, SCREEN_SIZE[1], TILESIZE):
+            pg.draw.line(self.gameDisplay, LIGHTGREY, (0, y), (SCREEN_SIZE[0], y))
+
     def draw(self):
         # GAME LOOP - DRAW
         self.gameDisplay.fill(BLACK)
+        self.gameDisplay.blit(BG, (0, 0))
+        # TEST PURPOSE ONLY
+        rendered = FONT.render("X: "+str(int(self.player.pos.x)), True, WHITE)
+        self.gameDisplay.blit(rendered, (10, 10))
+
+        rendered2 = FONT.render("Y: "+str(int(self.player.pos.y)), True, WHITE)
+        self.gameDisplay.blit(rendered2, (10, 35))
+
+        rendered3 = FONT.render("Wealth: 0", True, GREEN)
+        self.gameDisplay.blit(rendered3, (SCREEN_SIZE[0]/2 + 310, 10))
+        # TEST PURPOSE ONLY
+        self.draw_grid()
         self.all_sprites.draw(self.gameDisplay)
         pg.display.flip()
 

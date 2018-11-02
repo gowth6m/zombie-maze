@@ -6,8 +6,9 @@ vec = pg.math.Vector2
 class Player(pg.sprite.Sprite):
     def __init__(self):
         pg.sprite.Sprite.__init__(self)
-        self.image = pg.Surface((40, 40))
+        self.image = pg.Surface((32, 32))
         self.image.fill(SAKURA)
+        self.image.blit(P_IMG, (0, 0))
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2)
         self.pos = vec(SCREEN_SIZE[0]/2, SCREEN_SIZE[1]/2)
