@@ -17,13 +17,13 @@ class Player(pg.sprite.Sprite):
     def update(self):
         self.acc = vec(0, 0)
         keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT]:
+        if (keys[pg.K_LEFT] or keys[pg.K_a]):
             self.acc.x = -PLAYER_ACC
-        if keys[pg.K_RIGHT]:
+        if (keys[pg.K_RIGHT] or keys[pg.K_d]):
             self.acc.x = PLAYER_ACC
-        if keys[pg.K_UP]:
+        if (keys[pg.K_UP] or keys[pg.K_w]):
             self.acc.y = -PLAYER_ACC
-        if keys[pg.K_DOWN]:
+        if (keys[pg.K_DOWN] or keys[pg.K_s]):
             self.acc.y = PLAYER_ACC
 
         # FRICTION
@@ -31,12 +31,14 @@ class Player(pg.sprite.Sprite):
         # PHYSICS TINGS
         self.vel += self.acc
         self.pos += self.vel + 0.5 * self.acc
+
         # WRAP AROUND SCREEN SIDE
+        #WIDTH
         if self.pos.x > SCREEN_SIZE[0]:
             self.pos.x = 0
         if self.pos.x < 0:
             self.pos.x = SCREEN_SIZE[0]
-
+        #HEIGHT
         if self.pos.y > SCREEN_SIZE[1]:
             self.pos.y = 0
         if self.pos.y < 0:
