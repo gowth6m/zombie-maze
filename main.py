@@ -69,7 +69,7 @@ class Game:
         self.gameDisplay.blit(rendered2, (10, 35))
 
         rendered3 = FONT.render("Wealth: 0", True, GREEN)
-        self.gameDisplay.blit(rendered3, (SCREEN_SIZE[0]/2 + 310, 10))
+        self.gameDisplay.blit(rendered3, (SCREEN_SIZE[0]/2 + 220, 10))
         # TEST PURPOSE ONLY
         self.draw_grid()
         self.all_sprites.draw(self.gameDisplay)

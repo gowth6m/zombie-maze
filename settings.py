@@ -6,7 +6,7 @@ D_2 = (640, 480)
 TITLE = 'The Maze 【ツ】'
 WIDTH = 1024
 HEIGHT = int((WIDTH / 16) * 9)
-SCREEN_SIZE = (D_1)
+SCREEN_SIZE = (D_2)
 FPS = 60
 
 TILESIZE = 32
@@ -33,5 +33,5 @@ pg.font.init()
 FONT = pg.font.SysFont("None", 25)
 
 # IMAGES
-BG = pg.image.load("img/floor.png")
+BG = pg.image.load("img/floor_small.png")
 P_IMG = pg.image.load("img/player.png")
