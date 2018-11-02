@@ -1,69 +1,70 @@
+##########################
+######## THE MAZE ########
+##########################
+import pygame as pg
+import random
 import math
-import pygame
-import pygame.locals
 
-from classes.item import Item
-from classes.room import Room
-from classes.player import Player
+from settings import *
+from sprites import *
 
-pygame.init()
+class Game:
+    def __init__(self):
+        # INIT WINDOW ETC
+        pg.init()
+        pg.mixer.init()
+        self.gameDisplay = pg.display.set_mode(SCREEN_SIZE)
+        pg.display.set_caption(TITLE)
+        self.clock = pg.time.Clock()
+        self.running = True
 
-gameTitle = 'The Maze'
+    def new(self):
+        # START A NEW GAME - RESET
+        self.all_sprites = pg.sprite.Group()
+        self.player = Player()
+        self.all_sprites.add(self.player)
+        self.run()
 
-# SCREEN DIMENSIONS
-screenWidth = 1024
-screenHeight = int((screenWidth / 16) * 9)
+    def run(self):
+        # GAME LOOP
+        self.playing = True
+        while self.playing:
+            self.clock.tick(FPS)
+            self.events()
+            self.update()
+            self.draw()
 
-# COLOUR
-black = (0, 0, 0)
-white = (255, 255, 255)
+    def update(self):
+        # GAME LOOP - UPDATE
+        self.all_sprites.update()
 
-# PLAYER ATTRIBUTES
-player_1 = Player(40, 60, 10, 0, 0, 0)
+    def events(self):
+        # GAME LOOP - EVENTS
+        for event in pg.event.get():
+            # CHECK FOR CLOSING WINDOW
+            if event.type == pg.QUIT:
+                if self.playing:
+                    self.playing = False
+                self.running = False
 
-gameDisplay = pygame.display.set_mode((screenWidth, screenHeight))
-pygame.display.set_caption(gameTitle)
-clock = pygame.time.Clock()
+    def draw(self):
+        # GAME LOOP - DRAW
+        self.gameDisplay.fill(BLACK)
+        self.all_sprites.draw(self.gameDisplay)
+        pg.display.flip()
 
-# GAME LOOP
-run = True
-while run:
-    # pygame.time.delay(60)
+    def show_start_screen(self):
+        # AT THE START OF THE GAME SCREEN
+        pass
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
+    def show_go_screen(self):
+        # WHEN GAME OVER
+        pass
 
-        if event.type == pygame.KEYDOWN:
-            keys = pygame.key.get_pressed()
+g = Game()
+g.show_start_screen()
+while g.running:
+    g.new()
+    g.show_go_screen()
 
-            if((keys[pygame.K_LEFT] or keys[pygame.K_a]) and player_1.x > player_1.speed):
-                player_1.x -= player_1.speed
-            if((keys[pygame.K_RIGHT] or keys[pygame.K_d]) and player_1.x < screenWidth - player_1.playerWidth - player_1.speed):
-                player_1.x += player_1.speed
-            if((keys[pygame.K_UP] or keys[pygame.K_w]) and player_1.y > player_1.speed):
-                player_1.y -= player_1.speed
-            if((keys[pygame.K_DOWN] or keys[pygame.K_s]) and player_1.y < screenHeight - player_1.playerHeight - player_1.speed):
-                player_1.y += player_1.speed
-
-        if event.type == pygame.KEYUP:
-            keys = pygame.key.get_pressed()
-
-            if((keys[pygame.K_LEFT] or keys[pygame.K_a]) and player_1.x > player_1.speed):
-                player_1.x -= 0
-            if((keys[pygame.K_RIGHT] or keys[pygame.K_d]) and player_1.x < screenWidth - player_1.playerWidth - player_1.speed):
-                player_1.x += 0
-            if((keys[pygame.K_UP] or keys[pygame.K_w]) and player_1.y > player_1.speed):
-                player_1.y -= 0
-            if((keys[pygame.K_DOWN] or keys[pygame.K_s]) and player_1.y < screenHeight - player_1.playerHeight - player_1.speed):
-                player_1.y += 0
-
-# lololol
-        gameDisplay.fill(black)
-        pygame.draw.rect(gameDisplay, white, (player_1.x, player_1.y, player_1.playerWidth, player_1.playerHeight))
-        pygame.display.flip
-        pygame.display.update()
-        clock.tick(60)
-
-pygame.quit()
-# quit()
+pg.quit()
