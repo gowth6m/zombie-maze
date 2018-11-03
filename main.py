@@ -2,91 +2,101 @@
 ################ THE MAZE ################
 ##########################################
 import pygame as pg
+import sys
 import random
-import math
-
+from os import path
 from settings import *
 from sprites import *
-from room import *
+from tilemap import *
 
 class Game:
     def __init__(self):
-        # INIT WINDOW ETC
         pg.init()
-        pg.mixer.init()
-        self.gameDisplay = pg.display.set_mode(SCREEN_SIZE)
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
-        self.running = True
+        pg.key.set_repeat(30, 30)
+        self.load_data()
+
+    def load_data(self):
+        game_folder = path.dirname(__file__)
+        img_folder = path.join(game_folder, 'img')
+        self.map = Map(path.join(game_folder, 'map_small.txt'))
+        self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
 
     def new(self):
-        # START A NEW GAME - RESET
+        # INIT ALL VARIABLES AND SETUP FOR NEW GAME
         self.all_sprites = pg.sprite.Group()
-        # self.wall = pg.sprite.Group()
-        self.player = Player()
-        self.all_sprites.add(self.player)
-        # self.wall = Wall(20, 50)
-        self.run()
+        self.walls = pg.sprite.Group()
+        for row, tiles in enumerate(self.map.map_data):
+            for col, tile in enumerate(tiles):
+                if tile == '1':
+                    Wall(self, col, row)
+                if tile == 'P':
+                    self.player = Player(self, col, row)
+        self.camera = Camera(self.map.width, self.map.height)
 
     def run(self):
-        # GAME LOOP
+        # GAME LOOP - playing = False to end game
         self.playing = True
         while self.playing:
-            self.clock.tick(FPS)
+            self.dt = self.clock.tick(FPS) / 1000
             self.events()
             self.update()
             self.draw()
 
-    def update(self):
-        # GAME LOOP - UPDATE
-        self.all_sprites.update()
-        # self.message_display("SCORE")
+    def quit(self):
+        pg.quit()
+        sys.exit()
 
-    def events(self):
-        # GAME LOOP - EVENTS
-        for event in pg.event.get():
-            # CHECK FOR CLOSING WINDOW
-            if event.type == pg.QUIT:
-                if self.playing:
-                    self.playing = False
-                self.running = False
+    def update(self):
+        # # GAME LOOP - update
+        self.all_sprites.update()
+        self.camera.update(self.player)
 
     def draw_grid(self):
-        for x in range(0, SCREEN_SIZE[0], TILESIZE):
-            pg.draw.line(self.gameDisplay, LIGHTGREY, (x, 0), (x, SCREEN_SIZE[1]))
-        for y in range(0, SCREEN_SIZE[1], TILESIZE):
-            pg.draw.line(self.gameDisplay, LIGHTGREY, (0, y), (SCREEN_SIZE[0], y))
+        for x in range(0, WIDTH, TILESIZE):
+            pg.draw.line(self.screen, LIGHTGREY, (x, 0), (x, HEIGHT))
+        for y in range(0, HEIGHT, TILESIZE):
+            pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
 
     def draw(self):
-        # GAME LOOP - DRAW
-        self.gameDisplay.fill(BLACK)
-        self.gameDisplay.blit(BG, (0, 0))
-        # TEST PURPOSE ONLY
-        rendered = FONT.render("X: "+str(int(self.player.pos.x)), True, WHITE)
-        self.gameDisplay.blit(rendered, (10, 10))
-
-        rendered2 = FONT.render("Y: "+str(int(self.player.pos.y)), True, WHITE)
-        self.gameDisplay.blit(rendered2, (10, 35))
-
-        rendered3 = FONT.render("Wealth: 0", True, GREEN)
-        self.gameDisplay.blit(rendered3, (SCREEN_SIZE[0]/2 + 220, 10))
-        # TEST PURPOSE ONLY
+        self.screen.fill(BGCOLOR)
+        self.screen.blit(GRASS, (0, 0))
         self.draw_grid()
-        self.all_sprites.draw(self.gameDisplay)
+        for sprite in self.all_sprites:
+            self.screen.blit(sprite.image, self.camera.apply(sprite))
+        # self.all_sprites.draw(self.screen)
+
+        # TEST CODE TO SEE COORDINATES
+        rendered = FONT.render("X: "+str(int(self.player.pos.x)), True, WHITE)
+        self.screen.blit(rendered, (10, 10))
+        rendered = FONT.render("Y: "+str(int(self.player.pos.y)), True, WHITE)
+        self.screen.blit(rendered, (10, 30))
+        rendered3 = FONT.render("Wealth: 0", True, GREEN)
+        self.screen.blit(rendered3, (WIDTH-100, 10))
+        # UPDATE
         pg.display.flip()
 
+    def events(self):
+        # GAME LOOP - events
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                self.quit()
+            if event.type == pg.KEYDOWN:
+                if event.key == pg.K_ESCAPE:
+                    self.quit()
+
     def show_start_screen(self):
-        # AT THE START OF THE GAME SCREEN
         pass
 
     def show_go_screen(self):
-        # WHEN GAME OVER
         pass
 
+# CREATE GAME OBJECT
 g = Game()
 g.show_start_screen()
-while g.running:
+while True:
     g.new()
+    g.run()
     g.show_go_screen()
-
-pg.quit()
