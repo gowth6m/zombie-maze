@@ -21,7 +21,7 @@ class Game:
     def load_data(self):
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
-        self.map = Map(path.join(game_folder, 'map_small.txt'))
+        self.map = Map(path.join(game_folder, 'map_level1.txt'))
         self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
 
     def new(self):
@@ -63,7 +63,7 @@ class Game:
     def draw(self):
         self.screen.fill(BGCOLOR)
         self.screen.blit(GRASS, (0, 0))
-        self.draw_grid()
+        # self.draw_grid()
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
         # self.all_sprites.draw(self.screen)
