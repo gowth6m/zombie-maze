@@ -1,6 +1,8 @@
 # SPRITE CLASS
 import pygame as pg
+import math
 from settings import *
+# from main import Game
 vec = pg.math.Vector2
 
 class Player(pg.sprite.Sprite):
@@ -9,10 +11,15 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.player_img
+        # self.image.fill(WHITE)
+        self.orig_image = self.image
         # self.image.blit(P_IMG, (0, 0))
         self.rect = self.image.get_rect()
         self.vel = vec(0, 0)
         self.pos = vec(x, y) * TILESIZE
+        self.mouse_pos = pg.mouse.get_pos()
+        # self.p_angle = math.atan2(self.mouse_pos[0], self.mouse_pos[1])
+        # self.player_rot = pg.transform.rotate(self.image, 360 - self.p_angle * 57.29)
 
     def get_keys(self):
         self.vel = vec(0, 0)
@@ -48,13 +55,30 @@ class Player(pg.sprite.Sprite):
                 self.vel.y = 0
                 self.rect.y = self.pos.y
 
+    def rotate_player(self): #JUST NORMAL COORDs
+        mouse_x, mouse_y = pg.mouse.get_pos()
+        rel_x, rel_y = mouse_x - WIDTH/2, mouse_y - HEIGHT/2
+        angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+        self.image = pg.transform.rotate(self.orig_image, int(angle))
+        # self.rect = self.image.get_rect(center=self.pos)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+
+    # def player_rotate(self):  TESTING WITH VECTORS
+    #     player_dir = pg.mouse.get_pos() - self.pos
+    #     radius, angle = player_dir.as_polar()
+    #     self.image = pg.transform.rotate(self.orig_image, -angle * PLAYER_ROT_SPEED)
+        # self.rect = self.image.get_rect(center=self.rect.center)
+
     def update(self):
         self.get_keys()
         self.pos += self.vel * self.game.dt
-        self.rect.x = self.pos.x
+        self.rect.centerx = self.pos.x
         self.collide_with_walls('x')
-        self.rect.y = self.pos.y
+        self.rect.centery = self.pos.y
         self.collide_with_walls('y')
+        self.rotate_player()
+        # self.player_rotate()
 
         # WRAP AROUND SCREEN SIDE
         # if self.x > WIDTH:

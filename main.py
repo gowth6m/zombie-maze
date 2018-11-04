@@ -73,6 +73,9 @@ class Game:
         self.screen.blit(rendered, (10, 10))
         rendered = FONT.render("Y: "+str(int(self.player.pos.y)), True, WHITE)
         self.screen.blit(rendered, (10, 30))
+        rendered2 = FONT.render("MousePos: "+str(pg.mouse.get_pos()), True, WHITE)
+        self.screen.blit(rendered2, (10, 50))
+
         rendered3 = FONT.render("Wealth: 0", True, GREEN)
         self.screen.blit(rendered3, (WIDTH-100, 10))
         # UPDATE

@@ -23,8 +23,8 @@ class Camera:
         return entity.rect.move(self.camera.topleft)
 
     def update(self, target):
-        x = -target.rect.x + int(WIDTH/2)
-        y = -target.rect.y + int(HEIGHT/2)
+        x = -target.rect.centerx + int(WIDTH/2)
+        y = -target.rect.centery + int(HEIGHT/2)
 
         x = min(0, x)
         y = min(0, y)
