@@ -1,6 +1,7 @@
 #  IMPORTS AND FILES
 import pygame as pg
 import math
+# from main import *
 pg.init()
 pg.font.init()
 
@@ -28,10 +29,11 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 # PLAYER PROPERTIES
 # PLAYER_ACC = 8.0
 # PLAYER_FRICTION = -0.3
-PLAYER_SPEED = 150
 # PLAYER_IMG = 'slime.png'
+PLAYER_SPEED = 150
 PLAYER_IMG = 'main_player.png'
 PLAYER_ROT_SPEED = math.pi
+PLAYER_HIT_RECT = pg.Rect(0, 0, 32, 32)
 
 # FONT
 FONT = pg.font.SysFont("None", 25)

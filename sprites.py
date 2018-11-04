@@ -2,6 +2,7 @@
 import pygame as pg
 import math
 from settings import *
+from tilemap import collide_hit_rect
 # from main import Game
 vec = pg.math.Vector2
 
@@ -15,6 +16,8 @@ class Player(pg.sprite.Sprite):
         self.orig_image = self.image
         # self.image.blit(P_IMG, (0, 0))
         self.rect = self.image.get_rect()
+        self.hit_rect = PLAYER_HIT_RECT
+        self.hit_rect.center = self.rect.center
         self.vel = vec(0, 0)
         self.pos = vec(x, y) * TILESIZE
         self.mouse_pos = pg.mouse.get_pos()
@@ -37,23 +40,23 @@ class Player(pg.sprite.Sprite):
 
     def collide_with_walls(self, dir):
         if dir == 'x':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            hits = pg.sprite.spritecollide(self, self.game.walls, False, collide_hit_rect)
             if hits:
                 if self.vel.x > 0:
-                    self.pos.x = hits[0].rect.left - self.rect.width
+                    self.pos.x = hits[0].rect.left - self.hit_rect.width/2
                 if self.vel.x < 0:
-                    self.pos.x = hits[0].rect.right
+                    self.pos.x = hits[0].rect.right + self.hit_rect.width/2
                 self.vel.x = 0
-                self.rect.x = self.pos.x
+                self.hit_rect.centerx = self.pos.x
         if dir == 'y':
-            hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            hits = pg.sprite.spritecollide(self, self.game.walls, False, collide_hit_rect)
             if hits:
                 if self.vel.y > 0:
-                    self.pos.y = hits[0].rect.top - self.rect.height
+                    self.pos.y = hits[0].rect.top - self.hit_rect.height/2
                 if self.vel.y < 0:
-                    self.pos.y = hits[0].rect.bottom
+                    self.pos.y = hits[0].rect.bottom + self.hit_rect.height/2
                 self.vel.y = 0
-                self.rect.y = self.pos.y
+                self.hit_rect.centery = self.pos.y
 
     def rotate_player(self): #JUST NORMAL COORDs
         mouse_x, mouse_y = pg.mouse.get_pos()
@@ -73,11 +76,12 @@ class Player(pg.sprite.Sprite):
     def update(self):
         self.get_keys()
         self.pos += self.vel * self.game.dt
-        self.rect.centerx = self.pos.x
+        self.hit_rect.centerx = self.pos.x
         self.collide_with_walls('x')
-        self.rect.centery = self.pos.y
+        self.hit_rect.centery = self.pos.y
         self.collide_with_walls('y')
         self.rotate_player()
+        self.rect.center = self.hit_rect.center
         # self.player_rotate()
 
         # WRAP AROUND SCREEN SIDE

@@ -69,12 +69,17 @@ class Game:
         # self.all_sprites.draw(self.screen)
 
         # TEST CODE TO SEE COORDINATES
+        # GET_FPS = "{0:.2f}".format(self.clock.get_fps())
+
         rendered = FONT.render("X: "+str(int(self.player.pos.x)), True, WHITE)
         self.screen.blit(rendered, (10, 10))
         rendered = FONT.render("Y: "+str(int(self.player.pos.y)), True, WHITE)
         self.screen.blit(rendered, (10, 30))
         rendered2 = FONT.render("MousePos: "+str(pg.mouse.get_pos()), True, WHITE)
         self.screen.blit(rendered2, (10, 50))
+
+        rendered4 = FONT.render("FPS: "+str(round(self.clock.get_fps(), 2)), True, GREEN)
+        self.screen.blit(rendered4, (10, 80))
 
         rendered3 = FONT.render("Wealth: 0", True, GREEN)
         self.screen.blit(rendered3, (WIDTH-100, 10))
