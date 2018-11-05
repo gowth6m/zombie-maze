@@ -5,7 +5,10 @@ def collide_hit_rect(one, two):
     return one.hit_rect.colliderect(two.rect)
 
 class Map:
+    """The Map class: the map of the game."""
+
     def __init__(self, filename):
+        """Initialize the Map and it's attributes."""
         self.map_data = []
         with open(filename, 'rt') as f:
             for line in f:
@@ -17,7 +20,10 @@ class Map:
         self.height = self.tileHeight * TILESIZE
 
 class Camera:
+    """The Camera class: the camera that follows the player around."""
+
     def __init__(self, width, height):
+        """Initialize the Camera and it's attributes."""
         self.camera = pg.Rect(0, 0, width, height)
         self.width = width
         self.height = height

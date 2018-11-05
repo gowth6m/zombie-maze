@@ -3,11 +3,13 @@ import pygame as pg
 import math
 from settings import *
 from tilemap import collide_hit_rect
-# from main import Game
 vec = pg.math.Vector2
 
 class Player(pg.sprite.Sprite):
+    """The Player class: the main player of the game."""
+
     def __init__(self, game, x, y):
+        """Initialize the Player and it's attributes."""
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -21,6 +23,7 @@ class Player(pg.sprite.Sprite):
         self.mouse_pos = pg.mouse.get_pos()
 
     def get_keys(self):
+        """Gets keyboard inputs and moves the players according to that."""
         self.vel = vec(0, 0)
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]:
@@ -35,6 +38,7 @@ class Player(pg.sprite.Sprite):
             self.vel *= 0.85
 
     def collide_with_walls(self, dir):
+        """Call this when player collides with a wall."""
         if dir == 'x':
             hits = pg.sprite.spritecollide(self, self.game.walls, False, collide_hit_rect)
             if hits:
@@ -54,12 +58,12 @@ class Player(pg.sprite.Sprite):
                 self.vel.y = 0
                 self.hit_rect.centery = self.pos.y
 
-    def rotate_player(self): #JUST NORMAL COORDs
+    def rotate_player(self):
+        """Rotating the player to point where the mouse is, without using vectors"""
         mouse_x, mouse_y = pg.mouse.get_pos()
         rel_x, rel_y = mouse_x - WIDTH/2, mouse_y - HEIGHT/2
         angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
         self.image = pg.transform.rotate(self.orig_image, int(angle))
-        # self.rect = self.image.get_rect(center=self.pos)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
 
@@ -70,6 +74,7 @@ class Player(pg.sprite.Sprite):
         # self.rect = self.image.get_rect(center=self.rect.center)
 
     def update(self):
+        """Updates for the loop."""
         self.get_keys()
         self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
@@ -90,7 +95,10 @@ class Player(pg.sprite.Sprite):
         #     self.y = HEIGHT
 
 class Wall(pg.sprite.Sprite):
+    """The Wall class: the first type of wall in the game."""
+
     def __init__(self, game, x, y):
+        """Initialize Wall and it's attributes."""
         self.groups = game.all_sprites, game.walls
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
@@ -104,12 +112,14 @@ class Wall(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE
 
 class Wall2(pg.sprite.Sprite):
+    """The Wall class: the second type of wall in the game."""
+
     def __init__(self, game, x, y):
+        """Initialize Wall2 and it's attributes."""
         self.groups = game.all_sprites, game.walls
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        # self.image.fill(GREEN)
         self.image.blit(BG2, (0, 0))
         self.rect = self.image.get_rect()
         self.x = x
@@ -118,12 +128,14 @@ class Wall2(pg.sprite.Sprite):
         self.rect.y = y * TILESIZE
 
 class Mob(pg.sprite.Sprite):
+    """The Mob class: the mobs that chase after the player (zombie)."""
+
     def __init__(self, game, x, y):
+        """Initialize a Mob and it's attributes."""
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.mob_img
-        # self.orig_image = self.image
         self.rect = self.image.get_rect()
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
@@ -132,18 +144,8 @@ class Mob(pg.sprite.Sprite):
         self.rot = 0
 
     def update(self):
+        """Updates the position etc for the loop."""
         self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
         self.image = pg.transform.rotate(self.game.mob_img, self.rot)
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
-
-
-# class Mob(pg.sprite.Sprite):
-#     def __init__(self, game, x, y):
-#         self.groups = game.all_sprites, game.mobs
-#         pg.sprite.Sprite.__init__(self, self.groups)
-#         self.game = game
-#         self.image = MOB_IMG
-#         self.rect = self.image.get_rect()
-#         self.pos = vec(x, y) * TILESIZE
-#         self.rect.center = self.pos

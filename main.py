@@ -10,7 +10,10 @@ from sprites import *
 from tilemap import *
 
 class Game:
+    """The main game class: Contains main game loop."""
+
     def __init__(self):
+        """Initialize the game and it's attributes."""
         pg.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         pg.display.set_caption(TITLE)
@@ -19,6 +22,7 @@ class Game:
         self.load_data()
 
     def load_data(self):
+        """Loads data from file, such as images etc."""
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
         self.map = Map(path.join(game_folder, 'map_level1.txt'))
@@ -29,7 +33,7 @@ class Game:
         # self.wall_img = pg.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
 
     def new(self):
-        # INIT ALL VARIABLES AND SETUP FOR NEW GAME
+        """Initilize all variables and set up for new game."""
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
@@ -43,11 +47,10 @@ class Game:
                     Mob(self, col, row)
                 if tile == 'P':
                     self.player = Player(self, col, row)
-
         self.camera = Camera(self.map.width, self.map.height)
 
     def run(self):
-        # GAME LOOP - playing = False to end game
+        """Runs the game, setup conditions for when to run and when not."""
         self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
@@ -56,21 +59,17 @@ class Game:
             self.draw()
 
     def quit(self):
+        """Call this when you quit the game."""
         pg.quit()
         sys.exit()
 
     def update(self):
-        # # GAME LOOP - update
+        """Updates the loop for every frame, etc."""
         self.all_sprites.update()
         self.camera.update(self.player)
 
-    # def draw_grid(self):
-    #     for x in range(0, WIDTH, TILESIZE):
-    #         pg.draw.line(self.screen, LIGHTGREY, (x, 0), (x, HEIGHT))
-    #     for y in range(0, HEIGHT, TILESIZE):
-    #         pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
-
     def draw(self):
+        """Draws things on the screen."""
         self.screen.blit(GRASS, (0, 0))
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
@@ -85,13 +84,13 @@ class Game:
         rendered4 = FONT.render("FPS: "+str(round(self.clock.get_fps(), 2)), True, GREEN)
         self.screen.blit(rendered4, (10, 80))
 
-        rendered3 = FONT.render("Wealth: 0", True, GREEN)
-        self.screen.blit(rendered3, (WIDTH-100, 10))
+        rendered3 = FONT.render("Zombies Killed: 0", True, GREEN)
+        self.screen.blit(rendered3, (WIDTH-160, 10))
         # UPDATE
         pg.display.flip()
 
     def events(self):
-        # GAME LOOP - events
+        """Part of the main game loop - has game events."""
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()
@@ -100,13 +99,15 @@ class Game:
                     self.quit()
 
     def show_start_screen(self):
+        """Call this at the start of the game."""
         pass
 
     def show_go_screen(self):
+        """Call this when game is over."""
         pass
 
 # CREATE GAME OBJECT
-g = Game()
+g = Game() # MAKING AN INSTANCE OF YOUR GAME CLASS (THEN CALLING THE FUNCTIONS OF THE NEXT INSTANCE.)
 g.show_start_screen()
 while True:
     g.new()
