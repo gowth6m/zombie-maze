@@ -23,17 +23,27 @@ class Game:
         img_folder = path.join(game_folder, 'img')
         self.map = Map(path.join(game_folder, 'map_level1.txt'))
         self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
+        self.mob_img = pg.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
+
+        # self.wall_img = pg.image.load(path.join(img_folder, BG)).convert_alpha()
+        # self.wall_img = pg.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
 
     def new(self):
         # INIT ALL VARIABLES AND SETUP FOR NEW GAME
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
+        self.mobs = pg.sprite.Group()
         for row, tiles in enumerate(self.map.map_data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
                     Wall(self, col, row)
+                if tile == '2':
+                    Wall2(self, col, row)
+                if tile == 'M':
+                    Mob(self, col, row)
                 if tile == 'P':
                     self.player = Player(self, col, row)
+
         self.camera = Camera(self.map.width, self.map.height)
 
     def run(self):
@@ -54,22 +64,16 @@ class Game:
         self.all_sprites.update()
         self.camera.update(self.player)
 
-    def draw_grid(self):
-        for x in range(0, WIDTH, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (x, 0), (x, HEIGHT))
-        for y in range(0, HEIGHT, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
+    # def draw_grid(self):
+    #     for x in range(0, WIDTH, TILESIZE):
+    #         pg.draw.line(self.screen, LIGHTGREY, (x, 0), (x, HEIGHT))
+    #     for y in range(0, HEIGHT, TILESIZE):
+    #         pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
 
     def draw(self):
-        self.screen.fill(BGCOLOR)
         self.screen.blit(GRASS, (0, 0))
-        # self.draw_grid()
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
-        # self.all_sprites.draw(self.screen)
-
-        # TEST CODE TO SEE COORDINATES
-        # GET_FPS = "{0:.2f}".format(self.clock.get_fps())
 
         rendered = FONT.render("X: "+str(int(self.player.pos.x)), True, WHITE)
         self.screen.blit(rendered, (10, 10))

@@ -12,17 +12,13 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.player_img
-        # self.image.fill(WHITE)
         self.orig_image = self.image
-        # self.image.blit(P_IMG, (0, 0))
         self.rect = self.image.get_rect()
         self.hit_rect = PLAYER_HIT_RECT
         self.hit_rect.center = self.rect.center
         self.vel = vec(0, 0)
         self.pos = vec(x, y) * TILESIZE
         self.mouse_pos = pg.mouse.get_pos()
-        # self.p_angle = math.atan2(self.mouse_pos[0], self.mouse_pos[1])
-        # self.player_rot = pg.transform.rotate(self.image, 360 - self.p_angle * 57.29)
 
     def get_keys(self):
         self.vel = vec(0, 0)
@@ -82,7 +78,6 @@ class Player(pg.sprite.Sprite):
         self.collide_with_walls('y')
         self.rotate_player()
         self.rect.center = self.hit_rect.center
-        # self.player_rotate()
 
         # WRAP AROUND SCREEN SIDE
         # if self.x > WIDTH:
@@ -99,11 +94,56 @@ class Wall(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.walls
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        # self.image = game.wall_img
         self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.fill(GREEN)
         self.image.blit(BG, (0, 0))
         self.rect = self.image.get_rect()
         self.x = x
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+
+class Wall2(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites, game.walls
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        # self.image.fill(GREEN)
+        self.image.blit(BG2, (0, 0))
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+
+class Mob(pg.sprite.Sprite):
+    def __init__(self, game, x, y):
+        self.groups = game.all_sprites
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = game.mob_img
+        # self.orig_image = self.image
+        self.rect = self.image.get_rect()
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+        self.pos = vec(x, y) * TILESIZE
+        self.rect.center = self.pos
+        self.rot = 0
+
+    def update(self):
+        self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
+        self.image = pg.transform.rotate(self.game.mob_img, self.rot)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+
+
+# class Mob(pg.sprite.Sprite):
+#     def __init__(self, game, x, y):
+#         self.groups = game.all_sprites, game.mobs
+#         pg.sprite.Sprite.__init__(self, self.groups)
+#         self.game = game
+#         self.image = MOB_IMG
+#         self.rect = self.image.get_rect()
+#         self.pos = vec(x, y) * TILESIZE
+#         self.rect.center = self.pos
