@@ -14,7 +14,7 @@ RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 
 # GAME SETTINGS
-TITLE = 'The Maze'
+TITLE = 'Zombie Maze'
 WIDTH = 800
 HEIGHT = int(WIDTH/4 * 3)
 SCREEN_SIZE = (WIDTH, HEIGHT)
@@ -30,16 +30,23 @@ PLAYER_IMG = 'main_player.png'
 PLAYER_ROT_SPEED = math.pi
 PLAYER_HIT_RECT = pg.Rect(0, 0, 32, 32)
 
+# GUN PROPERTIES
+BULLET_IMG = 'bullet.png'
+BULLET_SPEED = 500
+BULLET_TRAVEL = 750
+BULLET_RATE = 150
+
 # MOB PROPERTIES
 MOB_IMG = 'mob1.png'
-MOB_SPEED = 75
+MOB_SPEED = 50
+MOB_S = 2.25
+MOB_HIT_RECT = pg.Rect(0, 0, 30, 30)
 
 # FONT
 FONT = pg.font.SysFont("None", 25)
 
 # IMAGES
-BG = pg.image.load("img/floor_small.png")
+BG = pg.image.load("img/thefloor.png")
 # BG = "floor_small.png"
-BG2 = pg.image.load("img/wall3.jpg")
-# P_IMG = pg.image.load("img/player.png")
-GRASS = pg.image.load("img/grass.jpg")
+BG2 = pg.image.load("img/wall2.jpg")
+BACKGROUND = pg.image.load("img/grass.jpg")

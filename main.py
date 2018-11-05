@@ -27,6 +27,7 @@ class Game:
         img_folder = path.join(game_folder, 'img')
         self.map = Map(path.join(game_folder, 'map_level1.txt'))
         self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
+        self.bullet_img = pg.image.load(path.join(img_folder, BULLET_IMG)).convert_alpha()
         self.mob_img = pg.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
 
         # self.wall_img = pg.image.load(path.join(img_folder, BG)).convert_alpha()
@@ -37,6 +38,7 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
+        self.bullets = pg.sprite.Group()
         for row, tiles in enumerate(self.map.map_data):
             for col, tile in enumerate(tiles):
                 if tile == '1':
@@ -70,7 +72,8 @@ class Game:
 
     def draw(self):
         """Draws things on the screen."""
-        self.screen.blit(GRASS, (0, 0))
+        self.screen.blit(BACKGROUND, (0, 0))
+        # self.screen.fill(BLACK)
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
 
@@ -107,7 +110,7 @@ class Game:
         pass
 
 # CREATE GAME OBJECT
-g = Game() # MAKING AN INSTANCE OF YOUR GAME CLASS (THEN CALLING THE FUNCTIONS OF THE NEXT INSTANCE.)
+g = Game() # MAKING AN INSTANCE OF YOUR GAME CLASS (THEN CALLING THE FUNCTIONS.)
 g.show_start_screen()
 while True:
     g.new()
