@@ -8,6 +8,26 @@ from os import path
 from settings import *
 from sprites import *
 from tilemap import *
+from time import sleep
+
+# GAME UI & HUD
+def draw_player_hp(surf, x, y, p):
+    if p < 0:
+        pct = 0
+    BAR_WIDTH = 100
+    BAR_HEIGHT = 20
+    fill = p * BAR_WIDTH
+    outline_rect = pg.Rect(x, y, BAR_WIDTH, BAR_HEIGHT)
+    fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    if p > 0.6:
+        colour = GREEN
+    elif 0 > 0.3:
+        colour = YELLOW
+    else:
+        colour = RED
+    pg.draw.rect(surf, colour, fill_rect)
+    pg.draw.rect(surf, WHITE, outline_rect, 2)
+
 
 class Game:
     """The main game class: Contains main game loop."""
@@ -69,16 +89,28 @@ class Game:
         """Updates the loop for every frame, etc."""
         self.all_sprites.update()
         self.camera.update(self.player)
-        # FOR TESTING
+        # MOBS HITTING PLAYER
+        hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
+        for hit in hits:
+            self.player.hp -= MOB_DAMAGE
+            hit.vel = vec(0, 0)
+            if self.player.hp <= 0:
+                self.playing = False
+            if hits:
+                self.player.pos += vec(MOB_KNOCKBACK, 0).rotate(-hits[0].rot)
+        # BULLET HITTING MOBS
         hits = pg.sprite.groupcollide(self.mobs, self.bullets, False, True)
         for hit in hits:
-            hit.kill()
+            hit.hp -= BULLET_DAMAGE
+            hit.vel = vec(0, 0)
 
     def draw(self):
         """Draws things on the screen."""
         self.screen.blit(BACKGROUND, (0, 0))
         # self.screen.fill(BLACK)
         for sprite in self.all_sprites:
+            if isinstance(sprite, Mob):
+                sprite.draw_hp()
             self.screen.blit(sprite.image, self.camera.apply(sprite))
 
         rendered = FONT.render("X: "+str(int(self.player.pos.x)), True, WHITE)
@@ -91,8 +123,10 @@ class Game:
         rendered4 = FONT.render("FPS: "+str(round(self.clock.get_fps(), 2)), True, GREEN)
         self.screen.blit(rendered4, (10, 80))
 
-        rendered3 = FONT.render("Zombies Killed: 0", True, GREEN)
+        rendered3 = FONT.render("Zombies Killed: " + str(self.player.zombies_killed), True, GREEN)
         self.screen.blit(rendered3, (WIDTH-160, 10))
+
+        draw_player_hp(self.screen, WIDTH-160, 30, self.player.hp / PLAYER_HP)
         # UPDATE
         pg.display.flip()
 
