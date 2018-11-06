@@ -2,6 +2,7 @@
 import pygame as pg
 import math
 
+from random import uniform
 from settings import *
 from tilemap import collide_hit_rect
 
@@ -67,7 +68,9 @@ class Player(pg.sprite.Sprite):
             if now - self.last_shot > BULLET_RATE:
                 self.last_shot = now
                 dir = vec(1, 0).rotate(-self.get_angle())
-                Bullet(self.game, self.pos, dir)
+                pos = self.pos + BULLET_OFFSET.rotate(-self.get_angle())
+                Bullet(self.game, pos, dir)
+                self.vel = vec(-KNOCKBACK, 0).rotate(-self.get_angle())
 
     def get_angle(self):
         mouse_x, mouse_y = pg.mouse.get_pos()
@@ -115,15 +118,27 @@ class Bullet(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.bullet_img
+        self.orig_image = self.image
         self.rect = self.image.get_rect()
         self.pos = vec(pos)
         self.rect.center = pos
-        self.vel = dir * BULLET_SPEED
+        spread = uniform(-GUN_SPREAD, GUN_SPREAD)
+        self.vel = dir.rotate(spread) * BULLET_SPEED
         self.spawn_time = pg.time.get_ticks()
+
+    # def rotate_bullet(self):
+    #     """Rotating the bullet to point where the mouse is, without using vectors"""
+    #     mouse_x, mouse_y = pg.mouse.get_pos()
+    #     rel_x, rel_y = mouse_x - WIDTH/2, mouse_y - HEIGHT/2
+    #     angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+    #     self.image = pg.transform.rotate(self.orig_image, int(angle))
+    #     self.rect = self.image.get_rect()
+    #     self.rect.center = self.pos
 
     def update(self):
         self.pos += self.vel * self.game.dt
         self.rect.center = self.pos
+        # self.rotate_bullet()
         if pg.time.get_ticks() - self.spawn_time > BULLET_TRAVEL:
             self.kill()
 
@@ -165,7 +180,7 @@ class Mob(pg.sprite.Sprite):
 
     def __init__(self, game, x, y):
         """Initialize a Mob and it's attributes."""
-        self.groups = game.all_sprites
+        self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.mob_img

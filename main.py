@@ -69,6 +69,10 @@ class Game:
         """Updates the loop for every frame, etc."""
         self.all_sprites.update()
         self.camera.update(self.player)
+        # FOR TESTING
+        hits = pg.sprite.groupcollide(self.mobs, self.bullets, False, True)
+        for hit in hits:
+            hit.kill()
 
     def draw(self):
         """Draws things on the screen."""

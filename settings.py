@@ -3,6 +3,7 @@ import pygame as pg
 import math
 pg.init()
 pg.font.init()
+vec = pg.math.Vector2
 
 # COLOURS
 WHITE = (255, 255, 255)
@@ -31,10 +32,13 @@ PLAYER_ROT_SPEED = math.pi
 PLAYER_HIT_RECT = pg.Rect(0, 0, 32, 32)
 
 # GUN PROPERTIES
+BULLET_OFFSET = vec(10, 10)
 BULLET_IMG = 'bullet.png'
-BULLET_SPEED = 500
-BULLET_TRAVEL = 750
-BULLET_RATE = 150
+BULLET_SPEED = 300
+BULLET_TRAVEL = 1000
+BULLET_RATE = 200
+KNOCKBACK = 25
+GUN_SPREAD = 5
 
 # MOB PROPERTIES
 MOB_IMG = 'mob1.png'
