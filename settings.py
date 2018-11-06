@@ -1,6 +1,7 @@
 #  IMPORTS AND FILES
 import pygame as pg
 import math
+from random import choice
 pg.init()
 pg.font.init()
 vec = pg.math.Vector2
@@ -45,10 +46,12 @@ BULLET_DAMAGE = 10
 
 # MOB PROPERTIES
 MOB_IMG = 'mob1.png'
-MOB_SPEED = 50
+MOB_IMG2 = 'mob2.png'
+MOB_SPEEDS = [50, 75, 25]
 MOB_S = 2.25
 MOB_HIT_RECT = pg.Rect(0, 0, 30, 30)
 MOB_HP = 100
+MOB_HP2 = 50
 MOB_DAMAGE = 10
 MOB_KNOCKBACK = 20
 AVOID_RADIUS = 50

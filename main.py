@@ -49,6 +49,7 @@ class Game:
         self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
         self.bullet_img = pg.image.load(path.join(img_folder, BULLET_IMG)).convert_alpha()
         self.mob_img = pg.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
+        self.mob2_img = pg.image.load(path.join(img_folder, MOB_IMG2)).convert_alpha()
 
         # self.wall_img = pg.image.load(path.join(img_folder, BG)).convert_alpha()
         # self.wall_img = pg.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
@@ -67,6 +68,8 @@ class Game:
                     Wall2(self, col, row)
                 if tile == 'M':
                     Mob(self, col, row)
+                if tile == 'T':
+                    Mob2(self, col, row)
                 if tile == 'P':
                     self.player = Player(self, col, row)
         self.camera = Camera(self.map.width, self.map.height)
