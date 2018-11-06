@@ -29,7 +29,6 @@ def sprite_collision(sprite, group, dir):
             sprite.vel.y = 0
             sprite.hit_rect.centery = sprite.pos.y
 
-
 class Player(pg.sprite.Sprite):
     """The Player class: the main player of the game."""
 
@@ -111,63 +110,6 @@ class Player(pg.sprite.Sprite):
         # if self.y < 0:
         #     self.y = HEIGHT
 
-class Bullet(pg.sprite.Sprite):
-    """The Bullet class: the bullets for the gun."""
-
-    def __init__(self, game, pos, dir):
-        """Initialize a bullet and it's attributes."""
-        self.groups = game.all_sprites, game.bullets
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = game.bullet_img
-        self.orig_image = self.image
-        self.rect = self.image.get_rect()
-        self.pos = vec(pos)
-        self.rect.center = pos
-        spread = uniform(-GUN_SPREAD, GUN_SPREAD)
-        self.vel = dir.rotate(spread) * BULLET_SPEED
-        self.spawn_time = pg.time.get_ticks()
-
-    def update(self):
-        self.pos += self.vel * self.game.dt
-        self.rect.center = self.pos
-        # self.rotate_bullet()
-        if pg.time.get_ticks() - self.spawn_time > BULLET_TRAVEL:
-            self.kill()
-
-class Wall(pg.sprite.Sprite):
-    """The Wall class: the first type of wall in the game."""
-
-    def __init__(self, game, x, y):
-        """Initialize Wall and it's attributes."""
-        self.groups = game.all_sprites, game.walls
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        # self.image = game.wall_img
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.blit(BG, (0, 0))
-        self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.rect.x = x * TILESIZE
-        self.rect.y = y * TILESIZE
-
-class Wall2(pg.sprite.Sprite):
-    """The Wall class: the second type of wall in the game."""
-
-    def __init__(self, game, x, y):
-        """Initialize Wall2 and it's attributes."""
-        self.groups = game.all_sprites, game.walls
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.image = pg.Surface((TILESIZE, TILESIZE))
-        self.image.blit(BG2, (0, 0))
-        self.rect = self.image.get_rect()
-        self.x = x
-        self.y = y
-        self.rect.x = x * TILESIZE
-        self.rect.y = y * TILESIZE
-
 class Mob(pg.sprite.Sprite):
     """The Mob class: the mobs that chase after the player (zombie)."""
 
@@ -238,3 +180,72 @@ class Mob(pg.sprite.Sprite):
 
         self.rect.center = self.hit_rect.center
         # self.move()
+
+class Bullet(pg.sprite.Sprite):
+    """The Bullet class: the bullets for the gun."""
+
+    def __init__(self, game, pos, dir):
+        """Initialize a bullet and it's attributes."""
+        self.groups = game.all_sprites, game.bullets
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = game.bullet_img
+        self.orig_image = self.image
+        self.rect = self.image.get_rect()
+        self.pos = vec(pos)
+        self.rect.center = pos
+        self.hit_rect = self.rect
+        spread = uniform(-GUN_SPREAD, GUN_SPREAD)
+        self.vel = dir.rotate(spread) * BULLET_SPEED
+        self.spawn_time = pg.time.get_ticks()
+
+    def update(self):
+        self.pos += self.vel * self.game.dt
+        self.rect.center = self.pos
+        # self.rotate_bullet()
+        if pg.time.get_ticks() - self.spawn_time > BULLET_TRAVEL:
+            self.kill()
+
+class Wall(pg.sprite.Sprite):
+    """The Wall class: the first type of wall in the game."""
+
+    def __init__(self, game, x, y):
+        """Initialize Wall and it's attributes."""
+        self.groups = game.all_sprites, game.walls
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        # self.image = game.wall_img
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.blit(BG, (0, 0))
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+
+class Wall2(pg.sprite.Sprite):
+    """The Wall class: the second type of wall in the game."""
+
+    def __init__(self, game, x, y):
+        """Initialize Wall2 and it's attributes."""
+        self.groups = game.all_sprites, game.walls
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image.blit(BG2, (0, 0))
+        self.rect = self.image.get_rect()
+        self.x = x
+        self.y = y
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+
+class Spawner(pg.sprite.Sprite):
+    """The Spawner class: Where zombies will spawn."""
+
+    def __init__(self, game, x, y):
+        """Initialize the Spawner and it's attributes."""
+        self.groups = game.all_sprites, game.spawners
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.x = x
+        self.y = y
