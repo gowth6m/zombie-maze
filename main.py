@@ -30,7 +30,6 @@ def draw_player_hp(surf, x, y, p):
     pg.draw.rect(surf, colour, fill_rect)
     pg.draw.rect(surf, WHITE, outline_rect, 2)
 
-
 class Game:
     """The main game class: Contains main game loop."""
 
@@ -47,7 +46,7 @@ class Game:
         """Loads data from file, such as images etc."""
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
-        self.map = Map(path.join(game_folder, 'map_level1.txt'))
+        self.map = Map(path.join(game_folder, 'map_small.txt'))
         self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
         self.bullet_img = pg.image.load(path.join(img_folder, BULLET_IMG)).convert_alpha()
         self.mob_img = pg.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
