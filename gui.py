@@ -1,5 +1,7 @@
 import pygame as pg
+from settings import *
 
+# GAME UI & HUD
 def draw_player_hp(surf, x, y, p):
     if p < 0:
         pct = 0

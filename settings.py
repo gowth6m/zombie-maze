@@ -21,7 +21,6 @@ WIDTH = 800
 HEIGHT = int(WIDTH/4 * 3)
 SCREEN_SIZE = (WIDTH, HEIGHT)
 FPS = 60
-
 TILESIZE = 32
 GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
@@ -47,20 +46,24 @@ BULLET_DAMAGE = 20
 # MOB PROPERTIES
 MOB_IMG = 'mob1.png'
 MOB_IMG2 = 'mob2.png'
+MOB_IMG3 = 'mob3.png'
+MOB_HP = 100
+MOB_HP2 = 50
+MOB_HP3 = 200
+
+MOB_DETECT = 400
 MOB_SPEEDS = [50, 75, 25]
 MOB_S = 2.25
 MOB_HIT_RECT = pg.Rect(0, 0, 30, 30)
-MOB_HP = 100
-MOB_HP2 = 50
 MOB_DAMAGE = 10
 MOB_KNOCKBACK = 20
 AVOID_RADIUS = 50
+BLOOD = 'blood.png'
 
 # FONT
 FONT = pg.font.SysFont("None", 25)
 
 # IMAGES
 BG = pg.image.load("img/thefloor.png")
-# BG = "floor_small.png"
 BG2 = pg.image.load("img/wall2.jpg")
 BACKGROUND = pg.image.load("img/grass.jpg")

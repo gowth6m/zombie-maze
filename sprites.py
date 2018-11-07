@@ -8,8 +8,16 @@ from tilemap import collide_hit_rect
 
 vec = pg.math.Vector2
 
+# GET ANGLE TO PLAYER OR MOUSE
+def get_angle(sprite):
+    mouse_x, mouse_y = pg.mouse.get_pos()
+    rel_x, rel_y = mouse_x - WIDTH/2, mouse_y - HEIGHT/2
+    angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
+    return angle
+
+# COLLISION BETWEEN SPRITES
 def sprite_collision(sprite, group, dir):
-    """Call this when player collides with a wall."""
+    """Call this when player or mob collides with a wall."""
     if dir == 'x':
         hits = pg.sprite.spritecollide(sprite, group, False, collide_hit_rect)
         if hits:
@@ -40,6 +48,7 @@ class Player(pg.sprite.Sprite):
         self.image = game.player_img
         self.orig_image = self.image
         self.rect = self.image.get_rect()
+        self.rect.center = vec(x, y)
         self.hit_rect = PLAYER_HIT_RECT
         self.hit_rect.center = self.rect.center
         self.vel = vec(0, 0)
@@ -69,16 +78,10 @@ class Player(pg.sprite.Sprite):
             now = pg.time.get_ticks()
             if now - self.last_shot > BULLET_RATE:
                 self.last_shot = now
-                dir = vec(1, 0).rotate(-self.get_angle())
-                pos = self.pos + BULLET_OFFSET.rotate(-self.get_angle())
+                dir = vec(1, 0).rotate(-get_angle(self))
+                pos = self.pos + BULLET_OFFSET.rotate(-get_angle(self))
                 Bullet(self.game, pos, dir)
-                self.vel = vec(-KNOCKBACK, 0).rotate(-self.get_angle())
-
-    def get_angle(self):
-        mouse_x, mouse_y = pg.mouse.get_pos()
-        rel_x, rel_y = mouse_x - WIDTH/2, mouse_y - HEIGHT/2
-        angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-        return angle
+                self.vel = vec(-KNOCKBACK, 0).rotate(-get_angle(self))
 
     def rotate_player(self):
         """Rotating the player to point where the mouse is, without using vectors"""
@@ -92,7 +95,6 @@ class Player(pg.sprite.Sprite):
     def update(self):
         """Updates for the loop."""
         self.get_keys()
-        self.get_angle()
         self.pos += self.vel * self.game.dt
         self.hit_rect.centerx = self.pos.x
         sprite_collision(self, self.game.walls, 'x')
@@ -111,6 +113,32 @@ class Player(pg.sprite.Sprite):
         # if self.y < 0:
         #     self.y = HEIGHT
 
+################################################################################
+# GLOBAL MOB FUNCTIONS
+def avoid_mobs(sprite):
+    for mob in sprite.game.mobs:
+        if mob != sprite:
+            distance = sprite.pos - mob.pos
+            if 0 < distance.length() < AVOID_RADIUS:
+                sprite.acc += distance.normalize()
+
+def draw_hp(sprite):
+    if sprite.hp > 0.60 * sprite.mob_hp:
+        colour = GREEN
+    elif sprite.hp > 0.30 * sprite.mob_hp:
+        colour = YELLOW
+    else:
+        colour = RED
+    width = int(sprite.rect.width * sprite.hp / sprite.mob_hp)
+    sprite.hp_bar = pg.Rect(0, 0, width, 7)
+    if sprite.hp < sprite.mob_hp:
+        pg.draw.rect(sprite.image, colour, sprite.hp_bar)
+    sprite.hit_rect.centerx = sprite.pos.x
+    sprite_collision(sprite, sprite.game.walls, 'x')
+    sprite.hit_rect.centery = sprite.pos.y
+    sprite_collision(sprite, sprite.game.walls, 'y')
+    sprite.rect.center = sprite.hit_rect.center
+
 class Mob(pg.sprite.Sprite):
     """The Mob class: the mobs that chase after the player (zombie)."""
 
@@ -119,8 +147,9 @@ class Mob(pg.sprite.Sprite):
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = game.mob_img
+        self.image = game.mob_img.copy()
         self.rect = self.image.get_rect()
+        self.rect.center = vec(x, y)
         self.hit_rect = MOB_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
         self.vel = vec(0, 0)
@@ -128,53 +157,27 @@ class Mob(pg.sprite.Sprite):
         self.pos = vec(x, y) * TILESIZE
         self.rect.center = self.pos
         self.rot = 0
-        self.hp = MOB_HP
+        self.mob_hp = MOB_HP
+        self.hp = self.mob_hp
         self.speed = choice(MOB_SPEEDS)
-
-    def get_angle(self):
-        mouse_x, mouse_y = pg.mouse.get_pos()
-        rel_x, rel_y = mouse_x - WIDTH/2, mouse_y - HEIGHT/2
-        angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-        return angle
-
-    def avoid_mobs(self):
-        for mob in self.game.mobs:
-            if mob != self:
-                distance = self.pos - mob.pos
-                if 0 < distance.length() < AVOID_RADIUS:
-                    self.acc += distance.normalize()
-
-    def draw_hp(self):
-        if self.hp > 0.60 * MOB_HP:
-            colour = GREEN
-        elif self.hp > 0.30 * MOB_HP:
-            colour = YELLOW
-        else:
-            colour = RED
-        width = int(self.rect.width * self.hp / MOB_HP)
-        self.hp_bar = pg.Rect(0, 0, width, 7)
-        if self.hp < MOB_HP:
-            pg.draw.rect(self.image, colour, self.hp_bar)
-        self.hit_rect.centerx = self.pos.x
-        sprite_collision(self, self.game.walls, 'x')
-        self.hit_rect.centery = self.pos.y
-        sprite_collision(self, self.game.walls, 'y')
-        self.rect.center = self.hit_rect.center
+        self.target = game.player
 
     def update(self):
         """Updates the position etc for the loop."""
-        self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
-        self.image = pg.transform.rotate(self.game.mob_img, self.rot)
-        self.rect = self.image.get_rect()
-        self.rect.center = self.pos
-        self.acc = vec(1, 0).rotate(-self.rot)
-        self.avoid_mobs()
-        self.acc.scale_to_length(self.speed)
-        self.acc += self.vel * -1
-        self.vel += self.acc * self.game.dt
-        self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
-        self.rect.center = self.pos
-        self.draw_hp()
+        target_dist = self.target.pos - self.pos
+        if target_dist.length_squared() < MOB_DETECT**2:
+            self.rot = target_dist.angle_to(vec(1, 0))
+            self.image = pg.transform.rotate(self.game.mob_img, self.rot)
+            self.rect = self.image.get_rect()
+            self.rect.center = self.pos
+            self.acc = vec(1, 0).rotate(-self.rot)
+            avoid_mobs(self)
+            self.acc.scale_to_length(self.speed)
+            self.acc += self.vel * -1
+            self.vel += self.acc * self.game.dt
+            self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
+            self.rect.center = self.pos
+        draw_hp(self)
         if self.hp <= 0:
             self.kill()
             self.game.player.zombies_killed += 1
@@ -189,6 +192,7 @@ class Mob2(pg.sprite.Sprite):
         self.game = game
         self.image = game.mob2_img
         self.rect = self.image.get_rect()
+        self.rect.center = vec(x, y)
         self.hit_rect = MOB_HIT_RECT.copy()
         self.hit_rect.center = self.rect.center
         self.vel = vec(0, 0)
@@ -196,38 +200,9 @@ class Mob2(pg.sprite.Sprite):
         self.pos = vec(x, y) * TILESIZE
         self.rect.center = self.pos
         self.rot = 0
-        self.hp = MOB_HP2
+        self.mob_hp = MOB_HP2
+        self.hp = self.mob_hp
         self.speed = choice(MOB_SPEEDS)
-
-    def get_angle(self):
-        mouse_x, mouse_y = pg.mouse.get_pos()
-        rel_x, rel_y = mouse_x - WIDTH/2, mouse_y - HEIGHT/2
-        angle = (180 / math.pi) * -math.atan2(rel_y, rel_x)
-        return angle
-
-    def avoid_mobs(self):
-        for mob in self.game.mobs:
-            if mob != self:
-                distance = self.pos - mob.pos
-                if 0 < distance.length() < AVOID_RADIUS:
-                    self.acc += distance.normalize()
-
-    def draw_hp(self):
-        if self.hp > 0.60 * MOB_HP2:
-            colour = GREEN
-        elif self.hp > 0.30 * MOB_HP2:
-            colour = YELLOW
-        else:
-            colour = RED
-        width = int(self.rect.width * self.hp / MOB_HP2)
-        self.hp_bar = pg.Rect(0, 0, width, 7)
-        if self.hp < MOB_HP2:
-            pg.draw.rect(self.image, colour, self.hp_bar)
-        self.hit_rect.centerx = self.pos.x
-        sprite_collision(self, self.game.walls, 'x')
-        self.hit_rect.centery = self.pos.y
-        sprite_collision(self, self.game.walls, 'y')
-        self.rect.center = self.hit_rect.center
 
     def update(self):
         """Updates the position etc for the loop."""
@@ -236,17 +211,58 @@ class Mob2(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = self.pos
         self.acc = vec(1, 0).rotate(-self.rot)
-        self.avoid_mobs()
+        avoid_mobs(self)
         self.acc.scale_to_length(self.speed)
         self.acc += self.vel * -1
         self.vel += self.acc * self.game.dt
         self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
         self.rect.center = self.pos
-        self.draw_hp()
+        draw_hp(self)
         if self.hp <= 0:
             self.kill()
             self.game.player.zombies_killed += 1
-            # self.game.spawn()
+
+class Mob3(pg.sprite.Sprite):
+    """The Mob2 class: the mobs that chase after the player (zombie)."""
+
+    def __init__(self, game, x, y):
+        """Initialize a Mob2 and it's attributes."""
+        self.groups = game.all_sprites, game.mobs
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = game.mob3_img
+        self.rect = self.image.get_rect()
+        self.rect.center = vec(x, y)
+        self.hit_rect = MOB_HIT_RECT.copy()
+        self.hit_rect.center = self.rect.center
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+        self.pos = vec(x, y) * TILESIZE
+        self.rect.center = self.pos
+        self.rot = 0
+        self.mob_hp = MOB_HP3
+        self.hp = self.mob_hp
+        self.speed = choice(MOB_SPEEDS)
+
+    def update(self):
+        """Updates the position etc for the loop."""
+        self.rot = (self.game.player.pos - self.pos).angle_to(vec(1, 0))
+        self.image = pg.transform.rotate(self.game.mob3_img, self.rot)
+        self.rect = self.image.get_rect()
+        self.rect.center = self.pos
+        self.acc = vec(1, 0).rotate(-self.rot)
+        avoid_mobs(self)
+        self.acc.scale_to_length(self.speed)
+        self.acc += self.vel * -1
+        self.vel += self.acc * self.game.dt
+        self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
+        self.rect.center = self.pos
+        draw_hp(self)
+        if self.hp <= 0:
+            self.kill()
+            self.game.player.zombies_killed += 1
+
+################################################################################
 
 class Bullet(pg.sprite.Sprite):
     """The Bullet class: the bullets for the gun."""
@@ -272,6 +288,8 @@ class Bullet(pg.sprite.Sprite):
         # self.rotate_bullet()
         if pg.time.get_ticks() - self.spawn_time > BULLET_TRAVEL:
             self.kill()
+
+################################################################################
 
 class Wall(pg.sprite.Sprite):
     """The Wall class: the first type of wall in the game."""
@@ -305,14 +323,3 @@ class Wall2(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
-
-class Spawner(pg.sprite.Sprite):
-    """The Spawner class: Where zombies will spawn."""
-
-    def __init__(self, game, x, y):
-        """Initialize the Spawner and it's attributes."""
-        self.groups = game.all_sprites, game.spawners
-        pg.sprite.Sprite.__init__(self, self.groups)
-        self.game = game
-        self.x = x
-        self.y = y
