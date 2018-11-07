@@ -49,6 +49,7 @@ class Player(pg.sprite.Sprite):
         self.last_shot = 0
         self.hp = PLAYER_HP
         self.zombies_killed = ZOMBIES_KILLED
+        self.zombies_killed_updated = 0
 
     def get_keys(self):
         """Gets keyboard inputs and moves the players according to that."""
@@ -245,6 +246,7 @@ class Mob2(pg.sprite.Sprite):
         if self.hp <= 0:
             self.kill()
             self.game.player.zombies_killed += 1
+            # self.game.spawn()
 
 class Bullet(pg.sprite.Sprite):
     """The Bullet class: the bullets for the gun."""

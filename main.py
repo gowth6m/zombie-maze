@@ -9,6 +9,8 @@ from settings import *
 from sprites import *
 from tilemap import *
 from time import sleep
+from random import randint
+from random import randrange, uniform
 
 # GAME UI & HUD
 def draw_player_hp(surf, x, y, p):
@@ -62,6 +64,8 @@ class Game:
         self.bullets = pg.sprite.Group()
         for row, tiles in enumerate(self.map.map_data):
             for col, tile in enumerate(tiles):
+                self.map_row = row
+                self.map_col = col
                 if tile == '1':
                     Wall(self, col, row)
                 if tile == '2':
@@ -130,6 +134,31 @@ class Game:
         self.screen.blit(rendered3, (WIDTH-160, 10))
 
         draw_player_hp(self.screen, WIDTH-160, 30, self.player.hp / PLAYER_HP)
+
+        if self.player.zombies_killed != self.player.zombies_killed_updated:
+            x = random.randint(0, self.map_col)
+            y = random.randint(0, self.map_row)
+            x1 = random.randint(0, self.map_col)
+            y1 = random.randint(0, self.map_row)
+            self.check_col = 0
+            self.check_row = 0
+
+            for row, tiles in enumerate(self.map.map_data):
+                for col, tile in enumerate(tiles):
+                    if tile == '1':
+                        self.check_col = col
+                        self.check_row = row
+
+            if (self.map_col, self.map_row) != (self.check_col, self.check_row):
+                mob = Mob(self, x, y)
+                mob2 = Mob2(self, x1, y1)
+
+                self.mobs.add(mob)
+                self.all_sprites.add(mob)
+                self.mobs.add(mob2)
+                self.all_sprites.add(mob2)
+                self.player.zombies_killed_updated += 1
+
         # UPDATE
         pg.display.flip()
 
@@ -149,6 +178,14 @@ class Game:
     def show_go_screen(self):
         """Call this when game is over."""
         pass
+
+    # def spawn(self):
+    #     x = randrange(0, WIDTH)
+    #     y = randrange(0, HEIGHT)
+    #     mob = Mob(self, x, y)
+    #     self.mobs.add(mob)
+    #     self.all_sprites.add(mob)
+    #     self.screen.blit(mob, mob.pos.x, mob.pos.y)
 
 # CREATE GAME OBJECT
 g = Game() # MAKING AN INSTANCE OF YOUR GAME CLASS (THEN CALLING THE FUNCTIONS.)

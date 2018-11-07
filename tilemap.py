@@ -4,6 +4,9 @@ from settings import *
 def collide_hit_rect(one, two):
     return one.hit_rect.colliderect(two.rect)
 
+S_WIDTH = 0
+S_WIDTH = 0
+
 class Map:
     """The Map class: the map of the game."""
 
@@ -18,6 +21,8 @@ class Map:
         self.tileHeight = len(self.map_data)
         self.width = self.tileWidth * TILESIZE
         self.height = self.tileHeight * TILESIZE
+        S_WIDTH = self.tileWidth
+        S_HEIGHT = self.tileHeight
 
 class Camera:
     """The Camera class: the camera that follows the player around."""
