@@ -35,8 +35,10 @@ class Game:
         self.mob_img = pg.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
         self.mob2_img = pg.image.load(path.join(img_folder, MOB_IMG2)).convert_alpha()
         self.mob3_img = pg.image.load(path.join(img_folder, MOB_IMG3)).convert_alpha()
-        self.blood = pg.image.load(path.join(img_folder, BLOOD)).convert_alpha()
-        self.blood = pg.transform.scale(self.blood, (TILESIZE, TILESIZE))
+        self.pausedScreen = pg.Surface(self.screen.get_size()).convert_alpha()
+        self.pausedScreen.fill((0,0,0,180))
+        # self.blood = pg.image.load(path.join(img_folder, BLOOD)).convert_alpha()
+        # self.blood = pg.transform.scale(self.blood, (TILESIZE, TILESIZE))
 
         # self.wall_img = pg.image.load(path.join(img_folder, BG)).convert_alpha()
         # self.wall_img = pg.transform.scale(self.wall_img, (TILESIZE, TILESIZE))
@@ -64,6 +66,7 @@ class Game:
                 if tile == 'P':
                     self.player = Player(self, col, row)
         self.camera = Camera(self.map.width, self.map.height)
+        self.paused = False
 
     def run(self):
         """Runs the game, setup conditions for when to run and when not."""
@@ -71,7 +74,8 @@ class Game:
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
-            self.update()
+            if not self.paused:
+                self.update()
             self.draw()
 
     def quit(self):
@@ -98,6 +102,9 @@ class Game:
             hit.hp -= BULLET_DAMAGE
             hit.vel = vec(0, 0)
 
+    # def drawBlood(self):
+    #     self.screen.blit(self.blood, self.player.pos)
+
     def draw(self):
         """Draws things on the screen."""
         self.screen.blit(BACKGROUND, (0, 0))
@@ -107,19 +114,21 @@ class Game:
                 draw_hp(sprite)
             self.screen.blit(sprite.image, self.camera.apply(sprite))
 
-        position = FONT.render("X: "+str(int(self.player.pos.x)), True, WHITE)
-        self.screen.blit(position, (10, 10))
-        position = FONT.render("Y: "+str(int(self.player.pos.y)), True, WHITE)
-        self.screen.blit(position, (10, 30))
+        # position = FONT.render("X: "+str(int(self.player.pos.x)), True, WHITE)
+        # self.screen.blit(position, (10, 30))
+        # position = FONT.render("Y: "+str(int(self.player.pos.y)), True, WHITE)
+        # self.screen.blit(position, (10, 50))
+        info = FONT.render("Press 'P' to pause the game.", True, WHITE)
+        self.screen.blit(info, (WIDTH - 250, HEIGHT - 25))
 
         hpfont = FONT.render("Health: ", True, WHITE)
         self.screen.blit(hpfont, (WIDTH-190, 10))
 
-        mouse = FONT.render("MousePos: "+str(pg.mouse.get_pos()), True, WHITE)
-        self.screen.blit(mouse, (10, 50))
+        mouse = FONT.render("Zombies alive: "+str(len(self.mobs)), True, RED)
+        self.screen.blit(mouse, (10, 30))
 
         fps = FONT.render("FPS: "+str(round(self.clock.get_fps(), 2)), True, GREEN)
-        self.screen.blit(fps, (10, 80))
+        self.screen.blit(fps, (10, 10))
 
         score = FONT.render("Zombies Killed: " + str(self.player.zombies_killed), True, GREEN)
         self.screen.blit(score, (WIDTH-160, 40))
@@ -150,7 +159,11 @@ class Game:
                 self.all_sprites.add(mob2)
                 self.player.zombies_killed_updated += 1
 
-        # UPDATE
+        if self.paused:
+            self.screen.blit(self.pausedScreen, (0, 0))
+            p_screen = FONT2.render("PAUSED!", True, GREEN)
+            self.screen.blit(p_screen, (WIDTH/2 - 75, HEIGHT/2 - 20))
+
         pg.display.flip()
 
     def events(self):
@@ -161,6 +174,8 @@ class Game:
             if event.type == pg.KEYDOWN:
                 if event.key == pg.K_ESCAPE:
                     self.quit()
+                if event.key == pg.K_p:
+                    self.paused = not self.paused
 
     def show_start_screen(self):
         """Call this at the start of the game."""

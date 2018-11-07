@@ -8,6 +8,7 @@ from tilemap import collide_hit_rect
 
 vec = pg.math.Vector2
 
+# killedMobPos = vec(0, 0)
 # GET ANGLE TO PLAYER OR MOUSE
 def get_angle(sprite):
     mouse_x, mouse_y = pg.mouse.get_pos()
@@ -181,6 +182,8 @@ class Mob(pg.sprite.Sprite):
         if self.hp <= 0:
             self.kill()
             self.game.player.zombies_killed += 1
+            # killedMobPos = self.pos
+            # self.game.drawBlood()
 
 class Mob2(pg.sprite.Sprite):
     """The Mob2 class: the mobs that chase after the player (zombie)."""

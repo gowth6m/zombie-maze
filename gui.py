@@ -12,7 +12,7 @@ def draw_player_hp(surf, x, y, p):
     fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
     if p > 0.6:
         colour = GREEN
-    elif 0 > 0.3:
+    elif p > 0.3:
         colour = YELLOW
     else:
         colour = RED
